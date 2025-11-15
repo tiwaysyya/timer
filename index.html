@@ -7,7 +7,7 @@
 
   <style>
     :root {
-      /* Brown / champagne / pink pastel palette */
+      /* Light mode: brown / champagne / pink pastel */
       --bg-page: #f7f1ed;        /* warm champagne */
       --bg-panel: #ffffff;
       --bg-soft: #f9f4f1;        /* soft blush */
@@ -23,6 +23,35 @@
 
       --good: #8aa681;           /* sage green */
       --danger: #c45b52;         /* muted terracotta red */
+    }
+
+    /* Dark mode palette overrides */
+    body.dark {
+      --bg-page: #251f1c;
+      --bg-panel: #302826;
+      --bg-soft: #362f2c;
+      --border-soft: #4a413d;
+
+      --accent: #d7a399;
+      --accent-soft: #4b3c38;
+      --accent-strong: #c58a80;
+
+      --text-main: #f4eae7;
+      --text-soft: #ccb8b1;
+      --text-faint: #9d8a83;
+
+      --good: #8fbf8b;
+      --danger: #e27a72;
+    }
+
+    /* Smooth transitions when toggling theme */
+    html, body, .frame, .mode-toggle, textarea, input, table,
+    .step-row, .steps-list, header, .page {
+      transition:
+        background-color 0.35s ease,
+        border-color 0.35s ease,
+        color 0.35s ease,
+        box-shadow 0.35s ease;
     }
 
     * { box-sizing: border-box; }
@@ -43,6 +72,23 @@
 
     header {
       margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    @media (min-width: 720px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+    }
+
+    .header-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     h1 {
@@ -55,9 +101,15 @@
     }
 
     .subtitle {
-      margin-top: 4px;
+      margin: 0;
       font-size: 14px;
       color: var(--text-soft);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .frame {
@@ -68,11 +120,12 @@
       padding: 14px 16px 18px;
     }
 
-    /* Mode toggle */
+    /* Mode toggle buttons */
     .mode-toggle-row {
       display: flex;
       gap: 8px;
       margin-bottom: 12px;
+      flex-wrap: wrap;
     }
 
     .mode-toggle {
@@ -87,6 +140,10 @@
       align-items: center;
       gap: 6px;
       transition: all 0.15s ease;
+    }
+
+    body.dark .mode-toggle {
+      background: #2b2421;
     }
 
     .mode-toggle.active {
@@ -113,33 +170,7 @@
       margin-bottom: 6px;
     }
 
-    textarea {
-      width: 100%;
-      min-height: 140px;
-      resize: vertical;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border-soft);
-      font-size: 13px;
-      background: #ffffff;
-      color: var(--text-main);
-    }
-
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
-      outline: none;
-    }
-
-    .controls-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      align-items: center;
-    }
-
+    /* Buttons */
     button {
       padding: 7px 12px;
       border-radius: 999px;
@@ -149,6 +180,10 @@
       cursor: pointer;
       transition: all 0.15s ease;
       color: var(--text-main);
+    }
+
+    body.dark button {
+      background: #342b28;
     }
 
     button:hover {
@@ -171,14 +206,79 @@
       background: #ffffff;
     }
 
+    body.dark .btn-ghost {
+      background: #342b28;
+    }
+
     .btn-danger {
       color: var(--danger);
       border-color: var(--danger);
     }
 
+    /* Dark mode toggle button special */
+    #darkToggle {
+      font-size: 12px;
+      padding: 6px 12px;
+      white-space: nowrap;
+    }
+
+    /* Inputs & textarea */
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      font-size: 13px;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    body.dark textarea {
+      background: #2f2724;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      outline: none;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 7px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    body.dark input[type="text"],
+    body.dark input[type="number"] {
+      background: #2f2724;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      outline: none;
+    }
+
     input[type="file"] {
       font-size: 13px;
       color: var(--text-soft);
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      align-items: center;
     }
 
     .helper-text {
@@ -210,6 +310,10 @@
       align-items: center;
     }
 
+    body.dark .step-row {
+      background: #322a27;
+    }
+
     .step-row.timed {
       border-color: var(--accent-soft);
     }
@@ -218,6 +322,10 @@
       background: var(--accent-soft);
       border-color: var(--accent);
       box-shadow: 0 3px 10px rgba(196, 139, 125, 0.35);
+    }
+
+    body.dark .step-row.active-step {
+      background: #4b3c38;
     }
 
     .step-index {
@@ -262,6 +370,10 @@
       background: #ffffff;
     }
 
+    body.dark .tag-untimed {
+      background: #342b28;
+    }
+
     /* Multi timer */
     .add-form {
       display: grid;
@@ -270,23 +382,6 @@
       align-items: end;
       margin-top: 8px;
       margin-bottom: 12px;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 7px;
-      border-radius: 8px;
-      border: 1px solid var(--border-soft);
-      background: #ffffff;
-      font-size: 13px;
-      color: var(--text-main);
-    }
-
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
-      outline: none;
     }
 
     table {
@@ -317,6 +412,10 @@
       background: #e8f4e8;
     }
 
+    body.dark tbody tr.finished {
+      background: #2f3f31;
+    }
+
     .step-name-cell {
       font-weight: 500;
     }
@@ -336,6 +435,10 @@
       color: var(--text-soft);
     }
 
+    body.dark .status-pill {
+      background: #342b28;
+    }
+
     .status-running {
       background: var(--accent-soft);
       border-color: var(--accent);
@@ -346,6 +449,10 @@
       background: #e8f4e8;
       border-color: var(--good);
       color: var(--good);
+    }
+
+    body.dark .status-finished {
+      background: #2f3f31;
     }
 
     .controls {
@@ -373,12 +480,16 @@
 <body>
 <div class="page">
   <header>
-    <h1>Lab Timer Workspace</h1>
-    <div class="subtitle">Protocol mode and multi timer mode in a pastel lab aesthetic.</div>
+    <div class="header-main">
+      <h1>Lab Timer Workspace</h1>
+      <p class="subtitle">Protocol mode and multi timer mode in a soft lab aesthetic.</p>
+    </div>
+    <div class="header-actions">
+      <button id="darkToggle" class="btn-ghost" type="button" onclick="toggleDark()">🌙 Dark mode</button>
+    </div>
   </header>
 
   <div class="frame">
-
     <!-- Mode toggle -->
     <div class="mode-toggle-row">
       <button class="mode-toggle active" data-mode="protocol" onclick="setMode('protocol')">📄 Protocol timer</button>
@@ -389,7 +500,8 @@
     <div id="mode-protocol" class="mode-panel active">
       <div class="section-title">Upload or paste protocol</div>
 
-      <textarea id="protocolInput" placeholder="Paste protocol here, one step per line. Include '5 min', '30 seconds', etc."></textarea>
+      <textarea id="protocolInput"
+                placeholder="Paste protocol here, one step per line. Include '5 min', '30 seconds', etc."></textarea>
 
       <div class="controls-row">
         <label>
@@ -451,6 +563,14 @@
 </div>
 
 <script>
+  /* Theme toggle */
+  function toggleDark() {
+    document.body.classList.toggle("dark");
+    const btn = document.getElementById("darkToggle");
+    const dark = document.body.classList.contains("dark");
+    btn.textContent = dark ? "☀️ Light mode" : "🌙 Dark mode";
+  }
+
   /* Mode toggle */
   function setMode(mode) {
     document.querySelectorAll(".mode-toggle").forEach(btn => {
@@ -725,4 +845,5 @@
 </script>
 </body>
 </html>
+
 
