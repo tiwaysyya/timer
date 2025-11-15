@@ -1,1 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lab Timer Workspace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      /* Brown / champagne / pink pastel palette */
+      --bg-page: #f7f1ed;        /* warm champagne */
+      --bg-panel: #ffffff;
+      --bg-soft: #f9f4f1;        /* soft blush */
+      --border-soft: #e3d4c9;    /* beige border */
+
+      --accent: #c48b7d;         /* dusty rose brown */
+      --accent-soft: #f3e1db;    /* pale pinky champagne */
+      --accent-strong: #af6f61;  /* deeper clay rose */
+
+      --text-main: #4b3b34;      /* soft brown */
+      --text-soft: #7b6960;      /* muted taupe */
+      --text-faint: #b6a59b;     /* light beige pink */
+
+      --good: #8aa681;           /* sage green */
+      --danger: #c45b52;         /* muted terracotta red */
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-page);
+      color: var(--text-main);
+      padding: 18px 14px 32px;
+      font-size: 14px;
+    }
+
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-main);
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    .frame {
+      background: var(--bg-panel);
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 10px 26px rgba(75, 59, 52, 0.14);
+      padding: 14px 16px 18px;
+    }
+
+    /* Mode toggle */
+    .mode-toggle-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .mode-toggle {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .mode-toggle.active {
+      background: var(--accent);
+      border-color: var(--accent-strong);
+      color: #fdf7f4;
+      box-shadow: 0 3px 10px rgba(196, 139, 125, 0.45);
+    }
+
+    .mode-toggle:not(.active):hover {
+      background: var(--accent-soft);
+      border-color: var(--accent-strong);
+      color: var(--text-main);
+    }
+
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-faint);
+      margin-bottom: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      font-size: 13px;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      outline: none;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    button {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      color: var(--text-main);
+    }
+
+    button:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent-strong);
+      box-shadow: 0 2px 6px rgba(196, 139, 125, 0.3);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fdf7f4;
+      border-color: var(--accent-strong);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-strong);
+    }
+
+    .btn-ghost {
+      background: #ffffff;
+    }
+
+    .btn-danger {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    input[type="file"] {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .helper-text {
+      color: var(--text-soft);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    /* Protocol mode styling */
+    .steps-list {
+      margin-top: 12px;
+      background: var(--bg-soft);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .step-row {
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .step-row.timed {
+      border-color: var(--accent-soft);
+    }
+
+    .step-row.active-step {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      box-shadow: 0 3px 10px rgba(196, 139, 125, 0.35);
+    }
+
+    .step-index {
+      font-size: 11px;
+      color: var(--text-faint);
+      margin-bottom: 3px;
+    }
+
+    .step-text {
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .step-timer-time {
+      font-size: 17px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-main);
+    }
+
+    .step-timer-label {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .tag-timed {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: var(--accent-soft);
+      font-size: 11px;
+      color: var(--accent-strong);
+    }
+
+    .tag-untimed {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      font-size: 11px;
+      color: var(--text-soft);
+      background: #ffffff;
+    }
+
+    /* Multi timer */
+    .add-form {
+      display: grid;
+      grid-template-columns: 2.3fr 0.9fr 0.9fr auto;
+      gap: 8px;
+      align-items: end;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 7px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      outline: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead {
+      background: var(--bg-soft);
+    }
+
+    th, td {
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--border-soft);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-faint);
+      font-size: 11px;
+    }
+
+    tbody tr.finished {
+      background: #e8f4e8;
+    }
+
+    .step-name-cell {
+      font-weight: 500;
+    }
+
+    .time-remaining {
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .status-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #ffffff;
+      border: 1px solid var(--border-soft);
+      color: var(--text-soft);
+    }
+
+    .status-running {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .status-finished {
+      background: #e8f4e8;
+      border-color: var(--good);
+      color: var(--good);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    @media (max-width: 720px) {
+      .step-row {
+        grid-template-columns: 2fr 1fr;
+      }
+      .add-form {
+        grid-template-columns: 1fr 0.7fr 0.7fr;
+        grid-template-rows: auto auto;
+      }
+      .add-form button {
+        grid-column: 1 / -1;
+        justify-self: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="page">
+  <header>
+    <h1>Lab Timer Workspace</h1>
+    <div class="subtitle">Protocol mode and multi timer mode in a pastel lab aesthetic.</div>
+  </header>
+
+  <div class="frame">
+
+    <!-- Mode toggle -->
+    <div class="mode-toggle-row">
+      <button class="mode-toggle active" data-mode="protocol" onclick="setMode('protocol')">📄 Protocol timer</button>
+      <button class="mode-toggle" data-mode="multi" onclick="setMode('multi')">⏱ Multi timers</button>
+    </div>
+
+    <!-- Protocol mode -->
+    <div id="mode-protocol" class="mode-panel active">
+      <div class="section-title">Upload or paste protocol</div>
+
+      <textarea id="protocolInput" placeholder="Paste protocol here, one step per line. Include '5 min', '30 seconds', etc."></textarea>
+
+      <div class="controls-row">
+        <label>
+          <input type="file" id="protocolFile" accept=".txt">
+        </label>
+        <button class="btn-ghost" type="button" onclick="loadExampleProtocol()">Load example</button>
+        <button class="btn-primary" type="button" onclick="parseProtocol()">Extract steps</button>
+      </div>
+
+      <div class="section-title">Steps</div>
+      <div id="protocolStepsContainer" class="steps-list">
+        No steps yet.
+      </div>
+
+      <div class="helper-text">
+        Timed steps are auto detected. Only one protocol timer runs at once so you do not lose track.
+      </div>
+    </div>
+
+    <!-- Multi timer mode -->
+    <div id="mode-multi" class="mode-panel">
+      <div class="section-title">Add timed step</div>
+
+      <form class="add-form" onsubmit="event.preventDefault(); addMultiStep();">
+        <div>
+          <label>Step</label>
+          <input id="stepName" type="text" placeholder="Incubate sample at 37°C" required>
+        </div>
+        <div>
+          <label>Minutes</label>
+          <input id="minutes" type="number" min="0" value="5">
+        </div>
+        <div>
+          <label>Seconds</label>
+          <input id="seconds" type="number" min="0" max="59" value="0">
+        </div>
+        <button class="btn-primary" type="submit">Add step</button>
+      </form>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Step</th>
+          <th>Initial</th>
+          <th>Remaining</th>
+          <th>Status</th>
+          <th>Controls</th>
+        </tr>
+        </thead>
+        <tbody id="stepsBody"></tbody>
+      </table>
+
+      <div class="helper-text">
+        Use this mode for overlapping timers. Each step runs independently.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* Mode toggle */
+  function setMode(mode) {
+    document.querySelectorAll(".mode-toggle").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.mode === mode);
+    });
+    document.getElementById("mode-protocol").classList.toggle("active", mode === "protocol");
+    document.getElementById("mode-multi").classList.toggle("active", mode === "multi");
+  }
+
+  /* Protocol mode logic */
+  let protocolSteps = [];
+  let activeProtocolTimerId = null;
+  let activeProtocolStepId = null;
+
+  function loadExampleProtocol() {
+    const example = [
+      "Thaw cells on ice for 10 minutes",
+      "Add lysis buffer and incubate for 5 min",
+      "Vortex briefly",
+      "Incubate at 37°C for 30 minutes",
+      "Spin at 13000 g for 45 seconds",
+      "Transfer supernatant"
+    ].join("\n");
+    document.getElementById("protocolInput").value = example;
+  }
+
+  function extractDurationSeconds(text) {
+    const lower = text.toLowerCase();
+    let total = 0;
+
+    const hourMatches = lower.matchAll(/(\d+)\s*(h|hr|hrs|hour|hours)/g);
+    const minMatches = lower.matchAll(/(\d+)\s*(min|mins|minute|minutes)/g);
+    const secMatches = lower.matchAll(/(\d+)\s*(s|sec|secs|second|seconds)/g);
+
+    for (const m of hourMatches) total += parseInt(m[1], 10) * 3600;
+    for (const m of minMatches) total += parseInt(m[1], 10) * 60;
+    for (const m of secMatches) total += parseInt(m[1], 10);
+
+    return total > 0 ? total : null;
+  }
+
+  function formatTime(total) {
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  }
+
+  function parseProtocol() {
+    const raw = document.getElementById("protocolInput").value;
+    const file = document.getElementById("protocolFile").files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => buildProtocolSteps(String(e.target.result));
+      reader.readAsText(file);
+    } else {
+      buildProtocolSteps(raw);
+    }
+  }
+
+  function buildProtocolSteps(text) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    protocolSteps = lines.map((line, i) => {
+      const d = extractDurationSeconds(line);
+      return {
+        id: "pstep-" + (i + 1),
+        index: i + 1,
+        text: line,
+        durationSeconds: d,
+        remainingSeconds: d
+      };
+    });
+
+    activeProtocolStepId = null;
+    if (activeProtocolTimerId) {
+      clearInterval(activeProtocolTimerId);
+      activeProtocolTimerId = null;
+    }
+    renderProtocolSteps();
+  }
+
+  function renderProtocolSteps() {
+    const container = document.getElementById("protocolStepsContainer");
+    if (!protocolSteps.length) {
+      container.textContent = "No steps found.";
+      return;
+    }
+    container.innerHTML = "";
+
+    protocolSteps.forEach(step => {
+      const div = document.createElement("div");
+      div.className = "step-row" + (step.durationSeconds ? " timed" : "");
+      if (step.id === activeProtocolStepId) div.classList.add("active-step");
+      div.id = step.id;
+
+      const timerDisplay = step.durationSeconds
+        ? `<div class="step-timer-time" data-timer-for="${step.id}">
+             ${formatTime(step.remainingSeconds ?? step.durationSeconds)}
+           </div>`
+        : `<div class="step-timer-label">No timer</div>`;
+
+      const tag = step.durationSeconds
+        ? `<span class="tag-timed">Timed</span>`
+        : `<span class="tag-untimed">Untimed</span>`;
+
+      div.innerHTML = `
+        <div>
+          <div class="step-index">Step ${step.index}</div>
+          <div class="step-text">${step.text}</div>
+        </div>
+        <div>
+          ${step.durationSeconds ? `<div class="step-timer-label">Initial: ${formatTime(step.durationSeconds)}</div>` : ""}
+          ${timerDisplay}
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+          ${tag}
+          ${step.durationSeconds ? `<button class="btn-ghost" type="button" onclick="startProtocolTimer('${step.id}')">Start</button>` : ""}
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function startProtocolTimer(stepId) {
+    const step = protocolSteps.find(s => s.id === stepId);
+    if (!step || !step.durationSeconds) return;
+
+    if (activeProtocolTimerId) {
+      clearInterval(activeProtocolTimerId);
+      activeProtocolTimerId = null;
+    }
+
+    step.remainingSeconds = step.durationSeconds;
+    activeProtocolStepId = stepId;
+    renderProtocolSteps();
+
+    const label = document.querySelector(`[data-timer-for="${stepId}"]`);
+    if (!label) return;
+
+    activeProtocolTimerId = setInterval(() => {
+      if (step.remainingSeconds <= 1) {
+        step.remainingSeconds = 0;
+        label.textContent = "00:00";
+        clearInterval(activeProtocolTimerId);
+        activeProtocolTimerId = null;
+        alert(`Timer finished for step ${step.index}`);
+        return;
+      }
+      step.remainingSeconds--;
+      label.textContent = formatTime(step.remainingSeconds);
+    }, 1000);
+  }
+
+  /* Multi timer logic */
+  let multiCount = 0;
+  const multiTimers = new Map();
+
+  function addMultiStep() {
+    const name = document.getElementById("stepName").value.trim();
+    const mins = parseInt(document.getElementById("minutes").value, 10) || 0;
+    const secs = parseInt(document.getElementById("seconds").value, 10) || 0;
+    const total = mins * 60 + secs;
+
+    if (!name || total <= 0) {
+      alert("Enter a valid step and time.");
+      return;
+    }
+
+    multiCount++;
+    const id = "mstep-" + multiCount;
+
+    const tbody = document.getElementById("stepsBody");
+    const tr = document.createElement("tr");
+    tr.id = id;
+    tr.dataset.initial = total;
+    tr.dataset.remaining = total;
+
+    tr.innerHTML = `
+      <td class="step-name-cell">${name}</td>
+      <td>${formatTime(total)}</td>
+      <td class="time-remaining">${formatTime(total)}</td>
+      <td><span class="status-pill">Idle</span></td>
+      <td>
+        <div class="controls">
+          <button type="button" onclick="startMultiTimer('${id}')">Start</button>
+          <button type="button" class="btn-ghost" onclick="pauseMultiTimer('${id}')">Pause</button>
+          <button type="button" class="btn-ghost" onclick="resetMultiTimer('${id}')">Reset</button>
+        </div>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+    document.getElementById("stepName").value = "";
+  }
+
+  function updateMultiStatus(id, status) {
+    const row = document.getElementById(id);
+    if (!row) return;
+    const pill = row.querySelector(".status-pill");
+
+    pill.classList.remove("status-running", "status-finished");
+    row.classList.remove("finished");
+
+    if (status === "running") {
+      pill.textContent = "Running";
+      pill.classList.add("status-running");
+    } else if (status === "finished") {
+      pill.textContent = "Finished";
+      pill.classList.add("status-finished");
+      row.classList.add("finished");
+    } else if (status === "paused") {
+      pill.textContent = "Paused";
+    } else {
+      pill.textContent = "Idle";
+    }
+  }
+
+  function startMultiTimer(id) {
+    const row = document.getElementById(id);
+    if (!row) return;
+
+    let remaining = parseInt(row.dataset.remaining, 10);
+    if (remaining <= 0) {
+      remaining = parseInt(row.dataset.initial, 10);
+      row.dataset.remaining = remaining;
+      row.querySelector(".time-remaining").textContent = formatTime(remaining);
+      row.classList.remove("finished");
+    }
+
+    if (multiTimers.has(id)) return;
+
+    updateMultiStatus(id, "running");
+
+    const interval = setInterval(() => {
+      let current = parseInt(row.dataset.remaining, 10);
+      if (current <= 1) {
+        clearInterval(interval);
+        multiTimers.delete(id);
+        row.dataset.remaining = 0;
+        row.querySelector(".time-remaining").textContent = "00:00";
+        updateMultiStatus(id, "finished");
+        return;
+      }
+      current--;
+      row.dataset.remaining = current;
+      row.querySelector(".time-remaining").textContent = formatTime(current);
+    }, 1000);
+
+    multiTimers.set(id, interval);
+  }
+
+  function pauseMultiTimer(id) {
+    if (!multiTimers.has(id)) return;
+    clearInterval(multiTimers.get(id));
+    multiTimers.delete(id);
+    updateMultiStatus(id, "paused");
+  }
+
+  function resetMultiTimer(id) {
+    if (multiTimers.has(id)) {
+      clearInterval(multiTimers.get(id));
+      multiTimers.delete(id);
+    }
+    const row = document.getElementById(id);
+    if (!row) return;
+    const initial = parseInt(row.dataset.initial, 10);
+    row.dataset.remaining = initial;
+    row.querySelector(".time-remaining").textContent = formatTime(initial);
+    row.classList.remove("finished");
+    updateMultiStatus(id, "idle");
+  }
+</script>
+</body>
+</html>
 
