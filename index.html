@@ -724,6 +724,44 @@
     }, 1000);
   }
 
+  /* -------------------------------------------------------
+     ADDED: triple-beep helper (for multi-timer finish only)
+     ------------------------------------------------------- */
+  let __beepCtx = null;
+
+  function __singleBeep(freq = 880, durationMs = 120, volume = 0.22) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+
+    if (!__beepCtx) __beepCtx = new AudioCtx();
+    if (__beepCtx.state === "suspended") __beepCtx.resume();
+
+    const now = __beepCtx.currentTime;
+    const o = __beepCtx.createOscillator();
+    const g = __beepCtx.createGain();
+
+    o.type = "sine";
+    o.frequency.setValueAtTime(freq, now);
+
+    // Fast attack, fast release
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(volume, now + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + (durationMs / 1000));
+
+    o.connect(g);
+    g.connect(__beepCtx.destination);
+
+    o.start(now);
+    o.stop(now + (durationMs / 1000) + 0.02);
+  }
+
+  function playTripleBeep() {
+    // Three quick beeps with tiny gaps
+    __singleBeep(880, 120, 0.22);
+    setTimeout(() => __singleBeep(880, 120, 0.22), 180);
+    setTimeout(() => __singleBeep(880, 120, 0.22), 360);
+  }
+
   /* Multi timer logic */
   let multiCount = 0;
   const multiTimers = new Map();
@@ -812,6 +850,10 @@
         row.dataset.remaining = 0;
         row.querySelector(".time-remaining").textContent = "00:00";
         updateMultiStatus(id, "finished");
+
+        /* ADDED: triple-beep when multi-timer ends */
+        playTripleBeep();
+
         return;
       }
       current--;
@@ -845,5 +887,6 @@
 </script>
 </body>
 </html>
+
 
 
